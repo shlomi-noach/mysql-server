@@ -891,6 +891,7 @@ extern unsigned long long rpl_semi_sync_master_net_wait_num;
 extern unsigned long long rpl_semi_sync_master_trx_wait_num;
 extern unsigned long long rpl_semi_sync_master_net_wait_time;
 extern unsigned long long rpl_semi_sync_master_trx_wait_time;
+extern unsigned long long rpl_semi_sync_master_ack_server_id;
 
 /*
   This indicates whether we should keep waiting if no semi-sync slave
