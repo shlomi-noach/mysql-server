@@ -133,7 +133,15 @@ int repl_semi_binlog_dump_start(Binlog_transmit_param *param,
   */
   get_user_var_int("rpl_semi_sync_slave", &semi_sync_slave, NULL);
 
-  if (semi_sync_slave != 0)
+  if (semi_sync_slave != 0 && rpl_semi_sync_master_ack_server_id && rpl_semi_sync_master_ack_server_id != current_thd->server_id)
+  {
+    /*
+      This is a semi sync replica; however, master's rpl_semi_sync_master_ack_server_id is set and the replica
+      doesn't have the expected server_id. We will treat it as asynchronous and ignore its acks.
+    */
+    param->set_dont_observe_flag();
+  }
+  else if (semi_sync_slave != 0)
   {
     if (ack_receiver.add_slave(current_thd))
     {
@@ -296,6 +304,13 @@ static MYSQL_SYSVAR_ULONG(trace_level, rpl_semi_sync_master_trace_level,
   NULL,				  // check
   &fix_rpl_semi_sync_master_trace_level, // update
   32, 0, ~0UL, 1);
+
+static MYSQL_SYSVAR_ULONGLONG(trace_level, rpl_semi_sync_master_ack_server_id,
+  PLUGIN_VAR_OPCMDARG,
+ "When set, only accept acks from a replica with this server_id",
+  NULL,				  // check
+  &rpl_semi_sync_master_ack_server_id, // update
+  0, 0, ~0UL, 1);
 
 static const char *wait_point_names[]= {"AFTER_SYNC", "AFTER_COMMIT", NullS};
 static TYPELIB wait_point_typelib= {
