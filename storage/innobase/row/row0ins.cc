@@ -987,6 +987,8 @@ func_exit:
   ut_a(pcur);
   ut_a(mtr);
 
+  LogErr(WARNING_LEVEL, ER_YES, "entering row_ins_foreign_check_on_constraint");
+
   trx = thr_get_trx(thr);
 
   node = static_cast<upd_node_t *>(thr->run_node);
